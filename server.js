@@ -8,12 +8,14 @@ app.use(express.json())
 // external packages
 const morgan = require('morgan')
 const cors = require('cors')
+const cookieParser = require('cookie-parser')
 
 // connect db function
 const connect = require('./db/connect')
 
 // initiate external packages
 app.use(morgan('dev'))
+app.use(cookieParser(process.env.JWT_SECRET))
 app.use(cors())
 
 // import routes

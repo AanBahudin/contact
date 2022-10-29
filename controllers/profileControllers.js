@@ -1,6 +1,7 @@
+const { StatusCodes } = require("http-status-codes")
 
 const getProfile = async(req, res) => {
-    res.send('get profile')
+    res.status(StatusCodes.OK).json({...req.user})
 }
 
 const updateEmailAndName = async(req, res) => {
