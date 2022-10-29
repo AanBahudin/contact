@@ -1,5 +1,6 @@
 const {StatusCodes} = require('http-status-codes')
 const Contact = require('../models/Contact')
+const checkPermission = require('../utils/checkPermission')
 
 const addContact = async(req, res) => {
     const {name, email, phone} = req.body
@@ -8,12 +9,13 @@ const addContact = async(req, res) => {
         res.status(StatusCodes.BAD_REQUEST).json({success: false, msg: 'Please atleast provide contact name'})
     }
 
-    const contact = await Contact.create({name, email: email ? email : '-', phone: phone ? phone : '-'});
+    const contact = await Contact.create({name, email: email ? email : '-', phone: phone ? phone : '-', user_id: req.user.userId});
     res.status(StatusCodes.OK).json({success: true, message: 'Successfully adding new contact', data: {contact}})
 }
 
 const getAllContact = async(req, res) => {
-    const contact = await Contact.find({});
+    const contact = await Contact.find({user_id: req.user.userId});
+
 
     res.status(StatusCodes.OK).json( {status: {success: true,msg: 'Successfully get all contact',response_code: 200},results: contact,total_contact: contact.length})
 }
@@ -33,6 +35,9 @@ const getSingleContact = async(req, res) => {
             results: []
         })
     }
+
+    // CHECKING SO OTHER USER CANNOT ACCESS OTHER'S CONTACT
+    checkPermission(contact.user_id, req.user.userId)
 
     res.status(StatusCodes.OK).json(
         {
